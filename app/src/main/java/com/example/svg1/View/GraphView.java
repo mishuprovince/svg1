@@ -3,13 +3,16 @@ package com.example.svg1.View;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
 import org.xml.sax.SAXException;
 
 import androidx.annotation.Nullable;
@@ -29,6 +32,8 @@ import org.w3c.dom.NodeList;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,37 +48,43 @@ public class GraphView extends View {
     private Square msquare;
     private Triangle mtriangle;
     private Text mtext;
+    private List<Text> texts=new ArrayList<>();
 
     private int colors[] = new int[]{0xff000000, 0xffffffff, 0xffffff00, 0xffff0000, 0xff0000ff};
     private Paint mPaint = new Paint();
 
     public GraphView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        this.context=context;
+        this.context = context;
         loadsvg.start();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-//        drawText(canvas);
         drawcircle(canvas);
         drawsquare(canvas);
         drawtriangle(canvas);
+        for(Text text:texts){
+            drawText(canvas,text);
+        }
     }
 
-    private void drawText(Canvas canvas) {
-        RectF rectF = new RectF();
-        mPaint.setTextSize(mtext.getSize());
-        mPaint.setColor(mtext.getColor());
-
-        canvas.drawText(mtext.getText(), mtext.getPoint().x, mtext.getPoint().y, mtext.getX(), mtext.getY(), mPaint);
-
+    private void drawText(Canvas canvas,Text textt) {
+        Rect rect = new Rect();
+        String text=textt.getText();
+        mPaint.setStrokeWidth(5);
+        mPaint.setTextSize(20);
+        mPaint.setTextAlign(Paint.Align.CENTER);
+        mPaint.setColor(textt.getColor());
+        //绘制中心的数值
+        mPaint.getTextBounds(text,0,textt.getText().length(),rect);
+        canvas.drawText(text,textt.getPoint().x+textt.getX(),textt.getY()+textt.getPoint().y+rect.height(),mPaint);
     }
 
     private void drawcircle(Canvas canvas) {
         mPaint.setColor(mcircle.getColor());
-        canvas.drawCircle(mcircle.getCx()+mcircle.getPoint().x, mcircle.getCy()+mcircle.getPoint().y, mcircle.getR()*mcircle.getScale(), mPaint);
+        canvas.drawCircle(mcircle.getCx() + mcircle.getPoint().x-100, mcircle.getCy() + mcircle.getPoint().y-100, mcircle.getR() * mcircle.getScale(), mPaint);
     }
 
     private void drawsquare(Canvas canvas) {
@@ -89,7 +100,11 @@ public class GraphView extends View {
 
     private void drawtriangle(Canvas canvas) {
         mPaint.setColor(mtriangle.getColor());
-        canvas.drawPath(mtriangle.getPath(), mPaint);
+        Path path=mtriangle.getPath();
+        Matrix matrix = new Matrix();
+        matrix.setTranslate(mtriangle.getPoint().x-100,mtriangle.getPoint().y-120);
+        path.transform(matrix);
+        canvas.drawPath(path, mPaint);
     }
 
     private Thread loadsvg = new Thread() {
@@ -99,22 +114,22 @@ public class GraphView extends View {
             InputStream inputStream = context.getResources().openRawResource(R.raw.sample);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             try {
-                Document doc =  factory.newDocumentBuilder().parse(inputStream);
+                Document doc = factory.newDocumentBuilder().parse(inputStream);
 
                 Element rootElement = doc.getDocumentElement();
 //                String canvas = rootElement.getAttribute("viewBox");
 //                NodeList itemList = rootElement.getElementsByTagName("svg");
-                NodeList itemList=rootElement.getChildNodes();
+                NodeList itemList = rootElement.getChildNodes();
                 for (int i = 0; i < itemList.getLength(); i++) {
-                    Node n=itemList.item(i);
+                    Node n = itemList.item(i);
                     Element gelement;
                     if (n.getNodeType() == Node.ELEMENT_NODE)
-                    gelement = (Element) n;
+                        gelement = (Element) n;
                     else
                         continue;
                     String point = gelement.getAttribute("transform");
 //                    NodeList gList = gelement.getElementsByTagName("g");
-                    NodeList gList=gelement.getChildNodes();
+                    NodeList gList = gelement.getChildNodes();
                     for (int j = 0; j < gList.getLength(); j++) {
                         Node node = gList.item(j);
                         if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -126,25 +141,26 @@ public class GraphView extends View {
                                 String r = child.getAttribute("r");
                                 String scale = child.getAttribute("transform");
                                 mcircle = new Circle(Integer.valueOf(cx), Integer.valueOf(cy), Integer.valueOf(r), judgecolor(color), traslateScale(scale), traslate(point));
-                            Log.i("circle",mcircle.toString());
+                                Log.i("circle", mcircle.toString());
                             } else if ("rect".equals(node.getNodeName())) {
                                 String width = child.getAttribute("width");
                                 String height = child.getAttribute("height");
                                 String scale = child.getAttribute("transform");
                                 msquare = new Square(Integer.valueOf(width), Integer.valueOf(height), judgecolor(color), traslateScale(scale), traslate(point));
-                            Log.i("square",msquare.toString());
+                                Log.i("square", msquare.toString());
                             } else if ("text".equals(node.getNodeName())) {
                                 String x = child.getAttribute("x");
                                 String y = child.getAttribute("y");
                                 String size = child.getAttribute("font-size");
                                 String text = child.getFirstChild().getNodeValue();
-                                mtext = new Text(text, Integer.valueOf(x), Integer.valueOf(y), judgecolor(color), Integer.valueOf(size), traslate(point));
-                                Log.i("text",mtext.toString());
+                                mtext = new Text(text, Integer.valueOf(x), Integer.valueOf(y), judgecolor("lll"), Integer.valueOf(size), traslate(point));
+                                texts.add(mtext);
+                                Log.i("text", mtext.toString());
                             } else {
                                 String paths = child.getAttribute("d");
                                 Path path = PathParser.createPathFromPathData(paths);
-mtriangle=new Triangle(judgecolor(color),path,traslate(point));
-Log.i("triangle",mtriangle.toString());
+                                mtriangle = new Triangle(judgecolor(color), path, traslate(point));
+                                Log.i("triangle", mtriangle.toString());
                             }
                         }
                     }
