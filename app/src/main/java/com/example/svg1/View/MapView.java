@@ -1,4 +1,4 @@
-package com.example.svg1;
+package com.example.svg1.View;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -7,18 +7,19 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.graphics.PathParser;
 
+
+import com.example.svg1.Entity.DrawMap;
+import com.example.svg1.R;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,7 +29,6 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -36,12 +36,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 
-public class SvgView extends View {
+public class MapView extends View {
 
     private Context context;
     private Paint paint;
-    private List<Graph> GraphList = new ArrayList<>();
-    private Graph selectGraph;
+    private List<DrawMap> drawMapList = new ArrayList<>();
+    private DrawMap selectMap;
     private RectF selectRect=new RectF();
     private float mAnimScale;
 
@@ -63,7 +63,7 @@ public class SvgView extends View {
     private String[] graphname = new String[]{"圆形", "正方形", "三角形"};
 
 
-    public SvgView(Context context, @Nullable AttributeSet attrs) {
+    public MapView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
@@ -87,18 +87,18 @@ public class SvgView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (GraphList != null && GraphList.size() > 0) {
+        if (drawMapList != null && drawMapList.size() > 0) {
             canvas.save();
 //            canvas.scale(scaleX, scaleY);
 
             canvas.scale(scale, scale);
-            for (Graph proviceItem : GraphList) {
-                if (selectGraph != proviceItem) {
+            for (DrawMap proviceItem : drawMapList) {
+                if (selectMap != proviceItem) {
                     proviceItem.draw(canvas, paint, false);
                 }
             }
-            if (selectGraph != null) {
-                selectGraph.draw(canvas, paint, true);
+            if (selectMap != null) {
+                selectMap.draw(canvas, paint, true);
             }
         }
         canvas.restore();
@@ -106,16 +106,16 @@ public class SvgView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (GraphList != null || GraphList.size() > 0) {
-            Graph selectItem = null;
-            for (Graph proviceItem : GraphList) {
+        if (drawMapList != null || drawMapList.size() > 0) {
+            DrawMap selectItem = null;
+            for (DrawMap proviceItem : drawMapList) {
                 if (proviceItem.isSelect(event.getX() / scaleX, event.getY() / scaleY)) {
                     selectItem = proviceItem;
                 }
             }
             if (selectItem != null) {
-                selectGraph = selectItem;
-                selectGraph.getPath().computeBounds(selectRect,true);
+                selectMap = selectItem;
+                selectMap.getPath().computeBounds(selectRect,true);
                 postInvalidate();
             }
         }
@@ -247,7 +247,7 @@ public class SvgView extends View {
             String pathData = element.getAttribute("android:pathData");
             String color = element.getAttribute("android:fillColor");
             Path path = PathParser.createPathFromPathData(pathData);
-            GraphList.add(new Graph(path, Color.parseColor(color), graphname[i % 3]));
+            drawMapList.add(new DrawMap(path, Color.parseColor(color), graphname[i % 3]));
             RectF rect = new RectF();
             path.computeBounds(rect, true);
             left = Math.min(left, rect.left);

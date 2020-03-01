@@ -1,13 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".Activity.MainActivity"
+    android:orientation="vertical">
 
-    <com.example.svg1.SvgView
-        android:layout_height="match_parent"
-        android:layout_width="match_parent" />
+    <TextView
+        android:gravity="center_horizontal"
+        android:background="@color/colorAccent"
+        android:id="@+id/welcome"
+        android:text="welcome"
+        android:textStyle="bold"
+        style="@style/menu"/>
+    <Button
+        android:id="@+id/graph"
+        android:text="图形"
+        style="@style/menu"/>
+    <Button
+        android:id="@+id/map"
+        android:text="地图"
+        style="@style/menu"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

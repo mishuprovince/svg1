@@ -1,5 +1,4 @@
-package com.example.svg1;
-
+package com.example.svg1.Entity;
 
 
 import android.graphics.Canvas;
@@ -7,13 +6,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.Region;
 
-public class Graph {
+public class DrawMap {
     private Path path;
     private int color;
     private String name;
+
+    private Point point;
 
     public int getColor() {
         return color;
@@ -31,7 +33,8 @@ public class Graph {
         this.name = name;
     }
 
-    public Graph(Path path, int color, String name) {
+
+    public DrawMap(Path path, int color, String name) {
         this.path = path;
         this.color = color;
         this.name = name;
@@ -45,25 +48,24 @@ public class Graph {
         this.path = path;
     }
 
-    void draw(Canvas canvas, Paint paint, boolean isSelect)
-    {
+    public void draw(Canvas canvas, Paint paint, boolean isSelect) {
         paint.setStrokeWidth(2);
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL);
         paint.setShadowLayer(8, 0, 0, 0xffffff);
         canvas.drawPath(path, paint);
-            paint.clearShadowLayer();
-            paint.setStrokeWidth(5);
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(color);
-            canvas.drawPath(path,paint);
+        paint.clearShadowLayer();
+        paint.setStrokeWidth(5);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(color);
+        canvas.drawPath(path, paint);
     }
 
-    public boolean isSelect(float x,float y){
-        RectF rectF=new RectF();
-        path.computeBounds(rectF,true);
-        Region region=new Region();
-        region.setPath(path,new Region((int)rectF.left,(int)rectF.top,(int)rectF.right,(int)rectF.bottom));
-        return region.contains((int)x, (int) y);
+    public boolean isSelect(float x, float y) {
+        RectF rectF = new RectF();
+        path.computeBounds(rectF, true);
+        Region region = new Region();
+        region.setPath(path, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
+        return region.contains((int) x, (int) y);
     }
 }
