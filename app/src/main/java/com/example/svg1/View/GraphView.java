@@ -43,13 +43,12 @@ import javax.xml.parsers.ParserConfigurationException;
 public class GraphView extends View {
 
     private Context context;
-    private Canvas canvas;
+    
     private Circle mcircle;
     private Square msquare;
     private Triangle mtriangle;
     private Text mtext;
     private List<Text> texts=new ArrayList<>();
-
     private int colors[] = new int[]{0xff000000, 0xffffffff, 0xffffff00, 0xffff0000, 0xff0000ff};
     private Paint mPaint = new Paint();
 
@@ -73,9 +72,7 @@ public class GraphView extends View {
     private void drawText(Canvas canvas,Text textt) {
         Rect rect = new Rect();
         String text=textt.getText();
-        mPaint.setStrokeWidth(5);
-        mPaint.setTextSize(20);
-        mPaint.setTextAlign(Paint.Align.CENTER);
+        mPaint.setTextSize(textt.getSize());
         mPaint.setColor(textt.getColor());
         //绘制中心的数值
         mPaint.getTextBounds(text,0,textt.getText().length(),rect);
