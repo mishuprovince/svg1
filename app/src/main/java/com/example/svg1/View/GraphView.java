@@ -43,7 +43,6 @@ import javax.xml.parsers.ParserConfigurationException;
 public class GraphView extends View {
 
     private Context context;
-    
     private Circle mcircle;
     private Square msquare;
     private Triangle mtriangle;
@@ -81,7 +80,8 @@ public class GraphView extends View {
 
     private void drawcircle(Canvas canvas) {
         mPaint.setColor(mcircle.getColor());
-        canvas.drawCircle(mcircle.getCx() + mcircle.getPoint().x-100, mcircle.getCy() + mcircle.getPoint().y-100, mcircle.getR() * mcircle.getScale(), mPaint);
+        int r=mcircle.getR() * mcircle.getScale();
+        canvas.drawCircle(mcircle.getCx() + mcircle.getPoint().x-r, mcircle.getCy() + mcircle.getPoint().y-r, r, mPaint);
     }
 
     private void drawsquare(Canvas canvas) {
